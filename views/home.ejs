@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      margin-top: 50px;
+    }
+
+    .card {
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="mb-4 text-center">Welcome to the Home Page</h1>
+
+    <div class="card" id="login-card">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Login</h2>
+        <form id="login-form" action="/auth/login" method="post">
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="login-email" name="email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="login-password" name="password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <a href="#" id="forgot-password-link" data-toggle="modal" data-target="#forgotPasswordModal">Forgot
+              Password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        <p class="text-center mt-3">Don't have an account? <a href="#" id="create-account-link">Create Account</a></p>
+      </div>
+    </div>
+
+    <div class="card hidden" id="signup-card">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Signup</h2>
+        <form id="signup-form" action="/auth/register" method="post">
+          <div class="form-group">
+            <label for="signup-email">Email:</label>
+            <input type="email" id="signup-email" name="email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password:</label>
+            <input type="password" id="signup-password" name="password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirmPassword" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-success btn-block">Signup</button>
+        </form>
+        <p class="text-center mt-3"><a href="#" id="back-to-login-link">Back to Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog"
+    aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/reset/forgot-password" method="post">
+            <div class="form-group">
+              <label for="forgot-email">Enter your email:</label>
+              <input type="email" id="forgot-email" name="email" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    document.getElementById('create-account-link').addEventListener('click', function () {
+      document.getElementById('login-card').classList.add('hidden');
+      document.getElementById('signup-card').classList.remove('hidden');
+    });
+
+    document.getElementById('back-to-login-link').addEventListener('click', function () {
+      document.getElementById('signup-card').classList.add('hidden');
+      document.getElementById('login-card').classList.remove('hidden');
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginForm = document.getElementById('login-form');
+
+      loginForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        const response = await fetch('http://localhost:8080/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) { 
+          window.location.href = '/user/dashboard';
+        } else {
+          alert(responseData.error);
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const signupForm = document.getElementById('signup-form');
+
+      signupForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value.trim();
+        const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+        if (password !== confirmPassword) {
+          alert("Passwords do not match. Please try again.");
+          return;
+        }
+
+        const response = await fetch('http://localhost:8080/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            confirmPassword,
+          }),
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) { 
+          window.location.href = '/user/dashboard';
+        } else {
+          alert(responseData.error);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
