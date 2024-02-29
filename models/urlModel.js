@@ -53,7 +53,7 @@ urlSchema.pre('save', function (next) {
 });
 urlSchema.pre('findOneAndUpdate', function (next) {
     const updatedFields = this._update.$set;
-    if (updatedFields.urlId) {
+    if (updatedFields && updatedFields.urlId) {
         updatedFields.shortUrl = `${process.env.CLIENT_URL}/${updatedFields.urlId}`;
     }
     next();
